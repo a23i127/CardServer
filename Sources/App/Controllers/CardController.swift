@@ -35,28 +35,29 @@ struct CardController: RouteCollection {
     func searchCard(req: Request) async throws -> [CardModels] {
         let queryObuj = CardModels.query(on: req.db)
         // クエリパラメータを取得
-        if let name = req.parameters.get("name") {
+        print(req.query[String.self, at: "searchTag"])
+        if let name = req.query[String.self, at: "name"] {              //名称
             let katakanaString = name.applyingTransform(.hiraganaToKatakana, reverse: false)
             if let katakanaString {
                 queryObuj.filter(\CardModels.$name ~~ katakanaString)
             }
         }
-        if let attribute = req.parameters.get("attribute") {
-            queryObuj.filter(\CardModels.$attribute == attribute)
-        }
-        if let lebel = req.parameters.get("lebel") {
+        if let attribute = req.query[String.self, at: "attribute"] {    //属性
+                queryObuj.filter(\CardModels.$attribute == attribute)
+            }
+        if let lebel = req.query[String.self, at: "lebel"] {            //レベル
             queryObuj.filter(\CardModels.$lebel == lebel)
         }
-        if let race = req.parameters.get("race") {
+        if let race = req.query[String.self, at: "race"] {              //種族
             queryObuj.filter(\CardModels.$race == race)
         }
-        if let trueName = req.parameters.get("name") {    //正式名称で検索したプレイヤーにヒットさせるため
+        if let trueName = req.query[String.self, at: "trueName"] {      //正式名称  //正式名称で検索したプレイヤーにヒットさせるため
             queryObuj.filter(\CardModels.$trueName == trueName)
         }
-        if let description = req.parameters.get("description") {
-            queryObuj.filter(\CardModels.$description ~~ description) //~~: 部分一致演算子(論理和)
+        if let description = req.query[String.self,at:"description"] {   //特徴
+            queryObuj.filter(\CardModels.$description ~~ description)    //~~: 部分一致演算子(論理和)
         }
-        if let searchTag = req.parameters.get("searchTag") {
+        if let searchTag = req.query[String.self, at: "searchTag"] {     //カテゴリ
             queryObuj.filter(\CardModels.$searchTag == searchTag)
         }
         // 結果を取得
